@@ -2,62 +2,30 @@ package ezgames.testing.matchers.exceptions;
 
 import org.hamcrest.Description;
 
-class HasACause<X extends Throwable> extends ThrowsMatcher<X>
+public class HasACause extends ThrowsMatcher
 {
-	public HasACause(ThrowsMatcher<X> toBeDecorated)
-	{
-		decoratedMatcher = toBeDecorated;
-	}
 	
-	//***************************************************************************
-	// Matcher Methods
-	//***************************************************************************
-	@Override
-	protected Throwable getException()
+	HasACause(ThrowsMatcher obj)
 	{
-		return decoratedMatcher.getException();
+		super(obj);
 	}
 	
 	@Override
-	protected boolean matchesSafely(ThrowingRunnable item)
+	public void chainDescribeTo(Description description)
 	{
-		try
-		{
-			matches = decoratedMatcher.matchesSafely(item) && getException().getCause() != null;
-		}
-		catch(NullPointerException ex)
-		{
-			matches = false;
-		}
-
-		return matches;
+		description.appendText("with a cause");
 	}
 	
 	@Override
-	public void describeTo(Description description)
+	protected boolean throwMatches(Throwable t)
 	{
-		decoratedMatcher.describeTo(description);
-		
-		description.appendText("\nexception had a cause");		
+		return t.getCause() != null;
 	}
 	
 	@Override
-	protected void describeMismatchSafely(ThrowingRunnable item, Description mismatchDescription)
+	protected void throwDescribeMismatch(Throwable t, Description mismatchDescription)
 	{
-		if(matches)
-		{
-			decoratedMatcher.describeMismatchSafely(item, mismatchDescription);
-		}
-		else
-		{
-			decoratedMatcher.describeTo(mismatchDescription);
-			mismatchDescription.appendText("\nexception had no cause");
-		}
+		mismatchDescription.appendText("with no cause");
 	}
 	
-	//***************************************************************************
-	// Private fields
-	//***************************************************************************
-	private ThrowsMatcher<X> decoratedMatcher;
-	private boolean matches;
 }

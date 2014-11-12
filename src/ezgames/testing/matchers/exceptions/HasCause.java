@@ -2,66 +2,34 @@ package ezgames.testing.matchers.exceptions;
 
 import org.hamcrest.Description;
 
-class HasCause<X extends Throwable> extends ThrowsMatcher<X>
-{	
-	public HasCause(ThrowsMatcher<X> toBeDecorated, Class<? extends Throwable> cause)
-	{
-		decoratedMatcher = toBeDecorated;
-		expectedCause = cause;
-	}
+public class HasCause extends ThrowsMatcher
+{
 	
-	//***************************************************************************
-	// Matcher Methods
-	//***************************************************************************
-	@Override
-	protected Throwable getException()
+	protected HasCause(ThrowsMatcher decoratedMatcher, Class<? extends Throwable> expectedCause)
 	{
-		return decoratedMatcher.getException();
+		super(decoratedMatcher);
+		this.expectedCause = expectedCause;
 	}
-	
-	@Override
-	protected boolean matchesSafely(ThrowingRunnable item)
-	{
-		try
-		{
-			matches = decoratedMatcher.matchesSafely(item) && getException().getCause().getClass().isAssignableFrom(expectedCause);
-		}
-		catch(NullPointerException ex)
-		{
-			matches = false;
-		}
 
-		return matches;
+	@Override
+	public void chainDescribeTo(Description description)
+	{
+		description.appendText("with cause of")
+			.appendText(expectedCause.getName());
 	}
 	
 	@Override
-	public void describeTo(Description description)
+	protected boolean throwMatches(Throwable t)
 	{
-		decoratedMatcher.describeTo(description);
-		
-		description.appendText("\nexception cause: ")
-				.appendText(expectedCause.getName());	
+		return expectedCause.isInstance(t.getCause());
 	}
 	
 	@Override
-	protected void describeMismatchSafely(ThrowingRunnable item, Description mismatchDescription)
+	protected void throwDescribeMismatch(Throwable t, Description mismatchDescription)
 	{
-		if(matches)
-		{
-			decoratedMatcher.describeMismatchSafely(item, mismatchDescription);
-		}
-		else
-		{
-			decoratedMatcher.describeTo(mismatchDescription);
-			mismatchDescription.appendText("\nexception cause: ")
-					.appendText(getException().getCause().getClass().getName());
-		}
+		mismatchDescription.appendText("with cause of ")
+			.appendText(t.getClass().getName());
 	}
 	
-	//***************************************************************************
-	// Private fields
-	//***************************************************************************
-	private ThrowsMatcher<X> decoratedMatcher;
-	private boolean matches;
-	private Class<? extends Throwable> expectedCause;
+	private Class<?> expectedCause;
 }

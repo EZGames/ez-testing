@@ -2,67 +2,43 @@ package ezgames.testing.matchers.exceptions;
 
 import org.hamcrest.Description;
 
-class HasMessage<X extends Throwable> extends ThrowsMatcher<X>
+public class HasMessage extends ThrowsMatcher
 {
-	public HasMessage(ThrowsMatcher<X> toBeDecorated, String message)
-	{
-		decoratedMatcher = toBeDecorated;
-		this.message = message;
-	}
 	
-	//***************************************************************************
-	// Matcher Methods
-	//***************************************************************************
-	@Override
-	protected Throwable getException()
+	protected HasMessage(ThrowsMatcher decoratedMatcher, String expectedMessage)
 	{
-		return decoratedMatcher.getException();
+		super(decoratedMatcher);
+		this.expectedMessage = expectedMessage;
 	}
-	
-	@Override
-	protected boolean matchesSafely(ThrowingRunnable item)
-	{
-		try
-		{
-			matches = decoratedMatcher.matchesSafely(item) && message.equals(getException().getMessage());
-		}
-		catch(NullPointerException ex)
-		{
-			//happens if the expected message given is null
-			matches = false;
-		}
 
-		return matches;
+	@Override
+	public void chainDescribeTo(Description description)
+	{
+		description.appendText("with message \"")
+			.appendText(expectedMessage)
+			.appendText("\"");
 	}
 	
 	@Override
-	public void describeTo(Description description)
+	protected boolean throwMatches(Throwable t)
 	{
-		decoratedMatcher.describeTo(description);
-		
-		description.appendText("\nexception message: ")
-				.appendText(message);		
+		return expectedMessage.equals(t.getMessage());
 	}
 	
 	@Override
-	protected void describeMismatchSafely(ThrowingRunnable item, Description mismatchDescription)
+	protected void throwDescribeMismatch(Throwable t, Description mismatchDescription)
 	{
-		if(matches)
+		if(t.getMessage() == null)
 		{
-			decoratedMatcher.describeMismatchSafely(item, mismatchDescription);
+			mismatchDescription.appendText("with no message");
 		}
 		else
 		{
-			decoratedMatcher.describeTo(mismatchDescription);
-			mismatchDescription.appendText("\nexception message: ")
-					.appendText(getException().getMessage());
+			mismatchDescription.appendText("with message \"")
+				.appendText(t.getMessage())
+				.appendText("\"");
 		}
 	}
 	
-	//***************************************************************************
-	// Private fields
-	//***************************************************************************
-	private ThrowsMatcher<X> decoratedMatcher;
-	private boolean matches;
-	private String message;
+	private String expectedMessage;
 }

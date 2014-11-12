@@ -2,62 +2,38 @@ package ezgames.testing.matchers.exceptions;
 
 import org.hamcrest.Description;
 
-class HasNoMessage<X extends Throwable> extends ThrowsMatcher<X>
+public class HasNoMessage extends ThrowsMatcher
 {
-	public HasNoMessage(ThrowsMatcher<X> toBeDecorated)
+	protected HasNoMessage(ThrowsMatcher decoratedMatcher)
 	{
-		decoratedMatcher = toBeDecorated;
-	}
-	
-	//***************************************************************************
-	// Matcher Methods
-	//***************************************************************************
-	@Override
-	protected Throwable getException()
-	{
-		return decoratedMatcher.getException();
+		super(decoratedMatcher);
 	}
 	
 	@Override
-	protected boolean matchesSafely(ThrowingRunnable item)
+	public void chainDescribeTo(Description description)
 	{
-		try
-		{
-			matches = decoratedMatcher.matchesSafely(item) && getException().getMessage() == null;
-		}
-		catch(NullPointerException ex)
-		{
-			matches = false;
-		}
-
-		return matches;
+		description.appendText("with no message");
 	}
 	
 	@Override
-	public void describeTo(Description description)
+	protected boolean throwMatches(Throwable t)
 	{
-		decoratedMatcher.describeTo(description);
-		
-		description.appendText("\nexception had no message");		
+		return t.getMessage() == null || messageIsNameOfCause(t);
+	}
+	
+	private boolean messageIsNameOfCause(Throwable t)
+	{
+		Throwable cause = t.getCause();
+		if(cause == null)
+			return false;
+		return cause.getClass().getName().equals(t.getMessage());
 	}
 	
 	@Override
-	protected void describeMismatchSafely(ThrowingRunnable item, Description mismatchDescription)
+	protected void throwDescribeMismatch(Throwable t, Description mismatchDescription)
 	{
-		if(matches)
-		{
-			decoratedMatcher.describeMismatchSafely(item, mismatchDescription);
-		}
-		else
-		{
-			decoratedMatcher.describeTo(mismatchDescription);
-			mismatchDescription.appendText("\nexception had a message");
-		}
-	}
-	
-	//***************************************************************************
-	// Private fields
-	//***************************************************************************
-	private ThrowsMatcher<X> decoratedMatcher;
-	private boolean matches;
+		mismatchDescription.appendText("with message \"")
+			.appendText(t.getMessage())
+			.appendText("\"");
+	}	
 }

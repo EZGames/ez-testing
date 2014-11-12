@@ -1,129 +1,47 @@
 package ezgames.testing.matchers.exceptions;
 
 import org.hamcrest.Description;
-import org.hamcrest.Factory;
 
-/**
- * {@code Throws} is a matcher that checks whether the given {@link Throwable}
- * type is thrown within the block of code given in the first part of the
- * {@code assertThat()} method.
- * @param <X> the Throwable type being checked for
- */
-public class Throws<X extends Throwable> extends ThrowsMatcher<X>
+public class Throws extends ThrowsMatcher
 {
-	//**************************************************************************
-	// Public static factory methods
-	//**************************************************************************
-	/**
-	 * Static factory method for creating a {@code Throws} Matcher.
-	 * @param ex - a {@code Throwable} class that the {@code ThrowingRunnable}
-	 * matched up with this Matcher is expected to throw
-	 * @return a new {@code Throws} object
-	 */
-	@Factory
-	public static <X extends Throwable> Throws<X> throwsA(Class<X> ex)
+	public static Throws throwsA(Class<? extends Throwable> expectedExceptionType)
 	{
-		return new Throws<X>(ex);
+		return new Throws(expectedExceptionType);
 	}
 	
-	/**
-	 * Static factory method for creating a {@code Throws} Matcher.
-	 * @param ex - a {@code Throwable} class that the {@code ThrowingRunnable}
-	 * matched up with this Matcher is expected to throw
-	 * @return a new {@code Throws} object
-	 */
-	@Factory
-	public static <X extends Throwable> Throws<X> throwsAn(Class<X> ex)
+	protected Throws(Class<? extends Throwable> expectedExceptionType)
 	{
-		return throwsA(ex);
-	}
-	
-	/**
-	 * Static factory method for creating a {@code Throws} Matcher.
-	 * <p>
-	 * Can be used with a normal import (rather than a static one):</p>
-	 * {@code assertThat(() -> methodThatThrows(), Throws.a(NullPointerException.class));
-	 * @param ex - a {@code Throwable} class that the {@code ThrowingRunnable}
-	 * matched up with this Matcher is expected to throw
-	 * @return a new {@code Throws} object
-	 */
-	@Factory
-	public static <X extends Throwable> Throws<X> a(Class<X> ex)
-	{
-		return throwsA(ex);
-	}
-	
-	/**
-	 * Static factory method for creating a {@code Throws} Matcher.
-	 * <p>
-	 * Can be used with a normal import (rather than a static one):</p>
-	 * {@code assertThat(() -> methodThatThrows(), Throws.an(IllegalStateException.class));
-	 * @param ex - a {@code Throwable} class that the {@code ThrowingRunnable}
-	 * matched up with this Matcher is expected to throw
-	 * @return a new {@code Throws} object
-	 */
-	@Factory
-	public static <X extends Throwable> Throws<X> an(Class<X> ex)
-	{
-		return throwsA(ex);
-	}
-	
-	//**************************************************************************
-	// Matcher methods
-	//**************************************************************************
-	@Override
-	public void describeTo(Description description)
-	{
-		description.appendText("threw a ")
-			.appendText(exType.getSimpleName());
+		super(null);
+		this.expectedExceptionType = expectedExceptionType;
 	}
 
 	@Override
-	protected boolean matchesSafely(ThrowingRunnable item)
+	public void chainDescribeTo(Description description)
 	{
-		try
-		{
-			item.run();
-		}
-		catch(Throwable ex)
-		{
-			actualException = ex;
-			if(exType.isInstance(ex))
-			{
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
-		return false;
+		description.appendText("threw ")
+			.appendText(expectedExceptionType.getName());
 	}
 	
 	@Override
-	protected void describeMismatchSafely(ThrowingRunnable item, Description mismatchDescription) 
+	protected boolean throwMatches(Throwable t)
 	{
-		mismatchDescription.appendText("threw a ")
-		   .appendText(actualException.getClass().getName());
-   }
-	
-	@Override
-	protected Throwable getException()
-	{
-		return actualException;
+		return expectedExceptionType.isInstance(t);
 	}
 	
-	//**************************************************************************
-	// Private fields
-	//**************************************************************************
-	private Class<X> exType;
-	private Throwable actualException;
-	
-	//**************************************************************************
-	// Private constructor
-	//**************************************************************************
-	private Throws(Class<X> ex)
+	@Override
+	protected void throwDescribeMismatch(Throwable t, Description mismatchDescription)
 	{
-		exType = ex;
-	}	
+		if(t == null)
+		{
+			mismatchDescription.appendText("No exception thrown");
+			return;
+		}
+		else
+		{
+			mismatchDescription.appendText("threw ")
+				.appendText(t.getClass().getName());
+		}
+	}
+	
+	private Class<? extends Throwable> expectedExceptionType;
 }

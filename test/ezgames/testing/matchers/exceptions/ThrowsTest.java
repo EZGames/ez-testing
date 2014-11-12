@@ -4,6 +4,7 @@ import static org.hamcrest.core.Is.is;
 import static ezgames.testing.matchers.exceptions.Throws.throwsAn;
 import static org.hamcrest.MatcherAssert.*;
 import org.junit.Test;
+import ezgames.testing.matchers.exceptions.ThrowingRunnable;
 
 public class ThrowsTest
 {

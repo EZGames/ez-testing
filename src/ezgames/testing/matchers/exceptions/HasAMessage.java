@@ -2,63 +2,38 @@ package ezgames.testing.matchers.exceptions;
 
 import org.hamcrest.Description;
 
-class HasAMessage<X extends Throwable> extends ThrowsMatcher<X>
-{	
-	public HasAMessage(ThrowsMatcher<X> toBeDecorated)
+public class HasAMessage extends ThrowsMatcher
+{
+	HasAMessage(ThrowsMatcher obj)
 	{
-		decoratedMatcher = toBeDecorated;
-	}
-	
-	//***************************************************************************
-	// Matcher Methods
-	//***************************************************************************
-	@Override
-	protected Throwable getException()
-	{
-		return decoratedMatcher.getException();
+		super(obj);
 	}
 	
 	@Override
-	protected boolean matchesSafely(ThrowingRunnable item)
+	public void chainDescribeTo(Description description)
 	{
-		try
-		{
-			matches = decoratedMatcher.matchesSafely(item) && getException().getMessage() != null;
-		}
-		catch(NullPointerException ex)
-		{
-			matches = false;
-		}
-
-		return matches;
+		description.appendText("with a message");
 	}
 	
 	@Override
-	public void describeTo(Description description)
+	protected boolean throwMatches(Throwable t)
 	{
-		decoratedMatcher.describeTo(description);
-		
-		description.appendText("\nexception had a message");		
+		String message = t.getMessage();
+		return message != null && !message.isEmpty() && messageIsntNameOfCause(t);
+	}
+	
+	private boolean messageIsntNameOfCause(Throwable t)
+	{
+		Throwable cause = t.getCause();
+		if(cause == null)
+			return true;
+		return !cause.getClass().getName().equals(t.getMessage());
 	}
 	
 	@Override
-	protected void describeMismatchSafely(ThrowingRunnable item, Description mismatchDescription)
+	protected void throwDescribeMismatch(Throwable t, Description mismatchDescription)
 	{
-		if(matches)
-		{
-			decoratedMatcher.describeMismatchSafely(item, mismatchDescription);
-		}
-		else
-		{
-			decoratedMatcher.describeTo(mismatchDescription);
-			mismatchDescription.appendText("\nexception had no message");
-		}
+		mismatchDescription.appendText("with no message");
 	}
-	
-	//***************************************************************************
-	// Private fields
-	//***************************************************************************
-	private ThrowsMatcher<X> decoratedMatcher;
-	private boolean matches;
 	
 }

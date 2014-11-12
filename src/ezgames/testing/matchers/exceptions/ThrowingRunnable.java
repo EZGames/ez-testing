@@ -1,5 +1,7 @@
 package ezgames.testing.matchers.exceptions;
 
+import ezgames.testing.matchers.exceptions.Throws;
+
 /**
  * For use with the {@link Throws} matcher, the {@code ThrowingRunnable}
  * interface is a functional interface similar to {@link Runnable}, except that

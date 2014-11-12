@@ -1,80 +1,63 @@
 package ezgames.testing.matchers.exceptions;
 
 import org.hamcrest.Description;
-import org.hamcrest.TypeSafeMatcher;
+import ezgames.testing.matchers.ChainableTypeSafeMatcher;
 
-abstract class ThrowsMatcher<X extends Throwable> extends TypeSafeMatcher<ThrowingRunnable>
+public abstract class ThrowsMatcher extends ChainableTypeSafeMatcher<ThrowingRunnable>
 {
-	/**
-	 * @return a new Matcher that decorates the current one to check whether the
-	 * the thrown Exception has any message
-	 */
-	public final ThrowsMatcher<X> andHasAMessage()
+	//***************************************************************************
+	// Constructor
+	//***************************************************************************
+	protected ThrowsMatcher(ThrowsMatcher decoratedMatcher)
 	{
-		return new HasAMessage<X>(this);
+		super(decoratedMatcher);
 	}
 	
-	/**
-	 * NOTE: If an exception has a cause, it WILL have a message.  If the message
-	 * isn't set explicitly, exceptions implicitly add the qualified name of the
-	 * cause class as the message.
-	 * @return a new Matcher that decorates the current one to make sure the
-	 * the thrown Exception has no message
-	 */
-	public final ThrowsMatcher<X> andHasNoMessage()
+	//***************************************************************************
+	// Chaining methods
+	//***************************************************************************
+	public ThrowsMatcher hasAMessage()
 	{
-		return new HasNoMessage<X>(this);
+		return new HasAMessage(this);
 	}
 	
-	/**
-	 * @return a new Matcher that decorates the current one to check whether the
-	 * the thrown Exception has the given message
-	 */
-	public final ThrowsMatcher<X> andHasMessage(String message)
+	public ThrowsMatcher hasACause()
 	{
-		return new HasMessage<X>(this, message);
+		return new HasACause(this);
 	}
 	
-	/**
-	 * @return a new Matcher that decorates the current one to make sure the
-	 * the thrown Exception has no cause
-	 */
-	public final ThrowsMatcher<X> andHasNoCause()
-	{
-		return new HasNoCause<X>(this);
-	}
-	
-	/**
-	 * @return a new Matcher that decorates the current one to check whether the
-	 * the thrown Exception has any cause
-	 */
-	public final ThrowsMatcher<X> andHasACause()
-	{
-		return new HasACause<X>(this);
-	}
-	
-	/**
-	 * @return a new Matcher that decorates the current one to check whether the
-	 * the thrown Exception has the given cause type
-	 */
-	public final ThrowsMatcher<X> andHasCause(Class<? extends Throwable> causeClass)
-	{
-		return new HasCause<X>(this, causeClass);
-	}
-	
-	/**
-	 * Until the innermost decorated class's {@code matchesSafely} method is
-	 * called, this only returns null.  After the method is called, this returns 
-	 * the {@link Throwable} that was caught in the in the {@code matchesSafely}
-	 * method, or null if nothing was thrown.
-	 * @return null, or the {@code Throwable} caught in the innermost class's
-	 * {@code matchesSafely} method. 
-	 */
-	abstract protected Throwable getException();	
+	//***************************************************************************
+	// Template methods
+	//***************************************************************************
 	@Override
-	abstract public void describeTo(Description description);
+	protected final boolean chainMatches(ThrowingRunnable item)
+	{
+		try
+		{
+			item.run();
+			return false;
+		}
+		catch(Throwable t)
+		{
+			thrown = t;
+			return throwMatches(t);
+		}
+	}
+	
 	@Override
-	abstract protected boolean matchesSafely(ThrowingRunnable item);	
-	@Override
-	abstract protected void describeMismatchSafely(ThrowingRunnable item, Description mismatchDescription);
+	protected final void chainDescribeMismatch(ThrowingRunnable item, Description mismatchDescription)
+	{
+		throwDescribeMismatch(thrown, mismatchDescription);
+	}
+	
+	//***************************************************************************
+	// Abstract methods
+	//***************************************************************************
+	protected abstract boolean throwMatches(Throwable t);
+	protected abstract void throwDescribeMismatch(Throwable t, Description mismatchDescription);
+	
+	//***************************************************************************
+	// Private fields
+	//***************************************************************************
+	private Throwable thrown;
 }
