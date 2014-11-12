@@ -75,8 +75,7 @@ public class Throws<X extends Throwable> extends ThrowsMatcher<X>
 	public void describeTo(Description description)
 	{
 		description.appendText("threw a ")
-			.appendText(exType.getSimpleName())
-			.appendText(", as expected.");
+			.appendText(exType.getSimpleName());
 	}
 
 	@Override
@@ -105,9 +104,7 @@ public class Throws<X extends Throwable> extends ThrowsMatcher<X>
 	protected void describeMismatchSafely(ThrowingRunnable item, Description mismatchDescription) 
 	{
 		mismatchDescription.appendText("threw a ")
-		   .appendText(actualException.getClass().getName())
-		   .appendText(" instead of a ")
-		   .appendText(exType.getName());
+		   .appendText(actualException.getClass().getName());
    }
 	
 	@Override

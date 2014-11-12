@@ -1,7 +1,7 @@
 package ezgames.testing.matchers;
 
-import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
+import org.hamcrest.TypeSafeMatcher;
 
 //TEST
 /**
@@ -16,7 +16,7 @@ import org.hamcrest.Description;
  * {@code Person} class that has {@code name} and {@code age} properties, this
  * abstract class would look something like this:</p>
  * <pre><code>
- * public abstract class ChainablePersonMatcher extends ChainableMatcher&lt;Person&gt; {
+ * public abstract class ChainablePersonMatcher extends ChainableTypeSafeMatcher&lt;Person&gt; {
  * 
  *    protected ChainablePersonMatcher(ChainablePersonMatcher toBeDecorated) {
  *       super(toBeDecorated);
@@ -36,7 +36,7 @@ import org.hamcrest.Description;
  * and {@code AgeChainablePersonMatcher}, to extend from this abstract class and
  * implement {@code chainDescribeTo()}, {@code chainMatches()}, and optionally
  * {@code chainDescribeMismatch()} the same way you normally would do {@code describeTo()},
- * {@code matches()}, and {@code describeMismatch()}. Don't forget the
+ * {@code matchesSafely()}, and {@code describeMismatchSafely()}. Don't forget the
  * factory methods, though.</p>
  * <p>
  * Once that's done, you can use the set of Matchers as follows:<br>
@@ -48,16 +48,16 @@ import org.hamcrest.Description;
  * that it passes {@code null} into the {@code super} constructor. </p>
  * <p>
  * For more information on how to use this, check out the <a href="">blog post</a>
- * that led to its development.
- * @param <T> the same T as in {@link org.hamcrest.BaseMatcher BaseMatcher}&lt;T&gt;
+ * that led to its development.</p>
+ * @param <T> the same T as in {@link org.hamcrest.TypeSafeMatcher TypeSafeMatcher}&lt;T&gt;
  * @author Jacob Zimmerman - sad2project
  */
-public abstract class ChainableMatcher<T> extends BaseMatcher<T>
+public abstract class ChainableTypeSafeMatcher<T> extends TypeSafeMatcher<T>
 {
 	//***************************************************************************
 	// Protected constructor
 	//***************************************************************************
-	protected ChainableMatcher(ChainableTypeSafeMatcher<? super T> decoratedMatcher)
+	protected ChainableTypeSafeMatcher(ChainableTypeSafeMatcher<? super T> decoratedMatcher)
 	{
 		this.decoratedMatcher = decoratedMatcher;
 		this.thisMatches = true;
@@ -68,24 +68,24 @@ public abstract class ChainableMatcher<T> extends BaseMatcher<T>
 	//***************************************************************************
 	/**
 	 * Implemented the same as describeTo() would be, but this is a method called
-	 * by ChainingMatcher's describeTo()
+	 * by ChainableTypeSafeMatcher's describeTo()
 	 * @see #describeTo() 
 	 */
 	public abstract void chainDescribeTo(Description description);
 	
 	/**
 	 * Implemented the same as matchesSafely() would be, but this is a method 
-	 * called by ChainingMatcher's matches()
+	 * called by ChainableTypeSafeMatcher's matchesSafely()
 	 * @see #matchesSafely()
 	 */
-	protected abstract boolean chainMatches(Object item);
+	protected abstract boolean chainMatches(T item);
 	
 	/**
 	 * Implemented the same as describeMismatchSafely() would be, but this is a
-	 * method call by ChainingMatcher's
-	 * @see #describeMismatch() 
+	 * method call by ChainableTypeSafeMatcher's describeMismatchSafely()
+	 * @see #describeMismatchSafely() 
 	 */
-	protected void chainDescribeMismatch(Object item, Description mismatchDescription)
+	protected void chainDescribeMismatch(T item, Description mismatchDescription)
 	{
 		mismatchDescription.appendText("was ")
 			.appendValue(item);
@@ -106,31 +106,33 @@ public abstract class ChainableMatcher<T> extends BaseMatcher<T>
 	}
 	
 	@Override
-	public final boolean matches(Object item)
+	protected final boolean matchesSafely(T item)
 	{
 		thisMatches = chainMatches(item);
 		
-		if(decoratedMatcher == null || decoratedMatcher.matches(item))
+		if(decoratedMatcher == null || decoratedMatcher.matchesSafely(item))
 			return thisMatches;
 		else
 			return false;
 	}
 	
 	@Override
-	public final void describeMismatch(Object item, Description mismatchDescription)
+	protected final void describeMismatchSafely(T item, Description mismatchDescription)
 	{
 		//if applicable, we want to get the match/mismatch descriptions of all the
 		// decorated matchers, too
 		if(decoratedMatcher != null)
 		{
-			decoratedMatcher.describeMismatch(item, mismatchDescription);
+			decoratedMatcher.describeMismatchSafely(item, mismatchDescription);
 			mismatchDescription.appendText("\n             ");
 		}
 		
 		if(thisMatches)
 			chainDescribeTo(mismatchDescription); //explicitly state that this one matched
 		else
-			chainDescribeMismatch(item, mismatchDescription);	
+			chainDescribeMismatch(item, mismatchDescription);		
+		
+		
 	}
 	
 	//***************************************************************************
