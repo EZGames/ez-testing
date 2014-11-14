@@ -1,15 +1,15 @@
 package ezgames.testing.matchers.exceptions;
 
-import ezgames.testing.matchers.exceptions.Throws;
+import ezgames.testing.matchers.exceptions.ThrowsA;
 
 /**
- * For use with the {@link Throws} matcher, the {@code ThrowingRunnable}
+ * For use with the {@link ThrowsA} matcher, the {@code ThrowingRunnable}
  * interface is a functional interface similar to {@link Runnable}, except that
  * it can throw a {@link Throwable}.  No specific Throwable type is required,
  * since it's intended us is with the Throws matcher, which does not require it
  * to.
  */
-public interface ThrowingRunnable
+public interface Thrower
 {
 	void run() throws Throwable;
 	
@@ -23,7 +23,7 @@ public interface ThrowingRunnable
 	 * @param runnable - a {@code ThrowingRunnable} to be returned
 	 * @return the {@code ThrowingRunnable} passed in
 	 */
-	public static ThrowingRunnable calling(ThrowingRunnable runnable) {
+	public static Thrower calling(Thrower runnable) {
 		return runnable;
 	}
 }

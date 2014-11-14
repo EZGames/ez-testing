@@ -2,15 +2,20 @@ package ezgames.testing.matchers.exceptions;
 
 import org.hamcrest.Description;
 
-public class HasMessage extends ThrowsMatcher
+public class WithMessage extends ThrowableBaseChainableMatcher
 {
-	
-	protected HasMessage(ThrowsMatcher decoratedMatcher, String expectedMessage)
+	//***************************************************************************
+	// Constructor
+	//***************************************************************************
+	protected WithMessage(ThrowableBaseChainableMatcher decoratedMatcher, String expectedMessage)
 	{
 		super(decoratedMatcher);
 		this.expectedMessage = expectedMessage;
 	}
 
+	//***************************************************************************
+	// Implementation methods
+	//***************************************************************************
 	@Override
 	public void chainDescribeTo(Description description)
 	{
@@ -40,5 +45,8 @@ public class HasMessage extends ThrowsMatcher
 		}
 	}
 	
+	//***************************************************************************
+	// Private field
+	//***************************************************************************
 	private String expectedMessage;
 }

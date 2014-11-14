@@ -2,14 +2,19 @@ package ezgames.testing.matchers.exceptions;
 
 import org.hamcrest.Description;
 
-public class HasACause extends ThrowsMatcher
+public class WithACause extends ThrowableBaseChainableMatcher
 {
-	
-	HasACause(ThrowsMatcher obj)
+	//***************************************************************************
+	// Constructor
+	//***************************************************************************
+	WithACause(ThrowableBaseChainableMatcher obj)
 	{
 		super(obj);
 	}
 	
+	//***************************************************************************
+	// Implementation methods
+	//***************************************************************************
 	@Override
 	public void chainDescribeTo(Description description)
 	{
