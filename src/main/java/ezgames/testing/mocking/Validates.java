@@ -38,6 +38,7 @@ public class Validates extends TypeSafeMatcher<Validatable>
 	@Override
 	protected void describeMismatchSafely(Validatable item, Description mismatchDescription) 
 	{
-		mismatchDescription.appendText(item.toString() + " did not validate");
+		mismatchDescription.appendText("failed to validate:\n       ")
+			.appendText(item.errorMessage());
    }
 }

@@ -10,4 +10,8 @@ public interface Validatable
 	 * @return whether the object was used correctly
 	 */
 	boolean validate();
+	/**
+	 * @return String message about why the object failed validation
+	 */
+	String errorMessage();
 }
