@@ -148,8 +148,10 @@ public abstract class ChainableMatcher<T> extends BaseMatcher<T>
 	/**
 	 * Generate a description of why the matcher has not accepted the item. The 
 	 * description will be part of a larger description of why a matching failed,
-	 * so it should be concise. This method assumes that matches(item) is false, 
-	 * but will not check this.
+	 * so it should be concise. This method assumes that matches(item) is false in
+	 * at least one point of the decoration chain, but will not check this. It will,
+	 * however check the result of the last call to {@code chainMatches()} (defaulted
+	 * to {@code true} if it was never called). 
 	 * <p>
 	 * <b>Extension Note:</b>
 	 * This method is called if <i>any</i> of the matchers in the decoration chain
