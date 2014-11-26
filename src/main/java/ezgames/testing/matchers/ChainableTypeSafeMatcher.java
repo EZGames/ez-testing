@@ -67,22 +67,29 @@ public abstract class ChainableTypeSafeMatcher<T> extends TypeSafeMatcher<T>
 	// Methods to implement
 	//***************************************************************************
 	/**
-	 * Implemented the same as describeTo() would be, but this is a method called
-	 * by ChainableTypeSafeMatcher's describeTo()
+	 * Implemented the same as {@code describeTo()} would be, but this is a method 
+	 * called by {@code ChainableTypeSafeMatcher}'s {@code describeTo()}
 	 * @see #describeTo() 
 	 */
 	public abstract void chainDescribeTo(Description description);
 	
 	/**
-	 * Implemented the same as matchesSafely() would be, but this is a method 
-	 * called by ChainableTypeSafeMatcher's matchesSafely()
+	 * Implemented the same as {@code matchesSafely()} would be, but this is a method 
+	 * called by {@code ChainableTypeSafeMatcher}'s {@code matchesSafely()}
 	 * @see #matchesSafely()
 	 */
 	protected abstract boolean chainMatches(T item);
 	
 	/**
-	 * Implemented the same as describeMismatchSafely() would be, but this is a
-	 * method call by ChainableTypeSafeMatcher's describeMismatchSafely()
+	 * Implemented the same as {@code describeMismatchSafely()} would be, but this
+	 * is a method call by ChainableTypeSafeMatcher's describeMismatchSafely()
+	 * <p>
+	 * <b>Extension Note:</b>
+	 * There is no need to try to implement a check of whether this specific
+	 * decorated matcher made a match or not. When {@code describeMismatch()} is 
+	 * called, it doesn't automatically call {@code chainDescribeMismatch()}. If
+	 * {@code chainMatches()} returned {@code true}, then {@code describeMismatch()}
+	 * will actually call {@code chainDescribeTo()}, not this method.</p>
 	 * @see #describeMismatchSafely() 
 	 */
 	protected void chainDescribeMismatch(T item, Description mismatchDescription)
@@ -94,6 +101,16 @@ public abstract class ChainableTypeSafeMatcher<T> extends TypeSafeMatcher<T>
 	//***************************************************************************
 	// Template methods
 	//***************************************************************************
+	/**
+	 * Generates a description of the object. The description may be part of a 
+	 * description of a larger object of which this is just a component, so it 
+	 * should be worded appropriately.
+	 * <p>
+	 * <b>Extension Note:</b>
+	 * This method calls the decorated matcher's {@code describeTo()} method (if 
+	 * there is a decorated matcher) then calls the overridden 
+	 * {@code chainDescribeTo()} to get the description for the implementation.</p>
+	 */
 	@Override
 	public final void describeTo(Description description)
 	{
@@ -105,6 +122,15 @@ public abstract class ChainableTypeSafeMatcher<T> extends TypeSafeMatcher<T>
 		chainDescribeTo(description);
 	}
 	
+	/**
+	 * Evaluates the matcher for argument item.<p>
+	 * The item will already have been checked for the specific type and will 
+	 * never be null.</p>
+	 * <p>
+	 * <b>Extension Note:</b>
+	 * This method calls {@code chainMatches()} then calls the decorated matcher's
+	 * {@code matches()} method (if there is a decorated matcher).</p>
+	 */
 	@Override
 	protected final boolean matchesSafely(T item)
 	{
@@ -116,6 +142,21 @@ public abstract class ChainableTypeSafeMatcher<T> extends TypeSafeMatcher<T>
 			return false;
 	}
 	
+	/**
+	 * Generate a description of why the matcher has not accepted the item. The 
+	 * description will be part of a larger description of why a matching failed,
+	 * so it should be concise. This method assumes that matches(item) is false, 
+	 * but will not check this. The item will already have been checked for the 
+	 * specific type and will never be null.
+	 * <p>
+	 * <b>Extension Note:</b>
+	 * This method is called if <i>any</i> of the matchers in the decoration chain
+	 * fails to match. Therefore, when this method is called, it calls the decorated
+	 * matcher's {@code describeMismatch()} then make a call to one of the
+	 * overridden description methods. If {@code chainMatches()} returned 
+	 * {@code true}, then this will call {@code chainDescribeTo()}. Otherwise, it
+	 * calls {@code chainDescribeMismatch()}.</p>
+	 */
 	@Override
 	protected final void describeMismatchSafely(T item, Description mismatchDescription)
 	{

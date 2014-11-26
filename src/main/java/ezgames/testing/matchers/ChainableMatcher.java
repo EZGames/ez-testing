@@ -1,5 +1,6 @@
 package ezgames.testing.matchers;
 
+import java.util.Optional;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 
@@ -59,7 +60,7 @@ public abstract class ChainableMatcher<T> extends BaseMatcher<T>
 	//***************************************************************************
 	protected ChainableMatcher(ChainableTypeSafeMatcher<? super T> decoratedMatcher)
 	{
-		this.decoratedMatcher = decoratedMatcher;
+		this.decoratedMatcher = Optional.ofNullable(decoratedMatcher);
 		this.thisMatches = true;
 	}
 
@@ -67,22 +68,29 @@ public abstract class ChainableMatcher<T> extends BaseMatcher<T>
 	// Methods to implement
 	//***************************************************************************
 	/**
-	 * Implemented the same as describeTo() would be, but this is a method called
-	 * by ChainingMatcher's describeTo()
+	 * Implemented the same as {@code describeTo()} would be, but this is a method 
+	 * called by {@code ChainingMatcher}'s {@code describeTo()}
 	 * @see #describeTo() 
 	 */
 	public abstract void chainDescribeTo(Description description);
 	
 	/**
-	 * Implemented the same as matchesSafely() would be, but this is a method 
-	 * called by ChainingMatcher's matches()
+	 * Implemented the same as {@code matches()} would be, but this is a method 
+	 * called by {@code ChainingMatcher}'s {@code matches()}
 	 * @see #matchesSafely()
 	 */
 	protected abstract boolean chainMatches(Object item);
 	
 	/**
-	 * Implemented the same as describeMismatchSafely() would be, but this is a
-	 * method call by ChainingMatcher's
+	 * Implemented the same as {@code describeMismatch()} would be, but this is a
+	 * method call by ChainingMatcher's {@code describeMismatch()}
+	 * <p>
+	 * <b>Extension Note:</b>
+	 * There is no need to try to implement a check of whether this specific
+	 * decorated matcher made a match or not. When {@code describeMismatch()} is 
+	 * called, it doesn't automatically call {@code chainDescribeMismatch()}. If
+	 * {@code chainMatches()} returned {@code true}, then {@code describeMismatch()}
+	 * will actually call {@code chainDescribeTo()}, not this method.</p>
 	 * @see #describeMismatch() 
 	 */
 	protected void chainDescribeMismatch(Object item, Description mismatchDescription)
@@ -94,38 +102,73 @@ public abstract class ChainableMatcher<T> extends BaseMatcher<T>
 	//***************************************************************************
 	// Template methods
 	//***************************************************************************
+	/**
+	 * Generates a description of the object. The description may be part of a 
+	 * description of a larger object of which this is just a component, so it 
+	 * should be worded appropriately.
+	 * <p>
+	 * <b>Extension Note:</b>
+	 * This method calls the decorated matcher's {@code describeTo()} method (if 
+	 * there is a decorated matcher) then calls the overridden 
+	 * {@code chainDescribeTo()} to get the description for the implementation.</p>
+	 */
 	@Override
 	public final void describeTo(Description description)
 	{
-		if(decoratedMatcher != null)
-		{
-			decoratedMatcher.describeTo(description);
-			description.appendText("\n              ");
-		}
+		decoratedMatcher.ifPresent(matcher -> 
+				{
+					matcher.describeTo(description);
+					description.appendText("\n              ");
+				});
 		chainDescribeTo(description);
 	}
 	
+	/**
+	 * Evaluates the matcher for argument item.<p>
+	 * This method matches against Object, instead of the generic type T. This is
+	 * because the caller of the Matcher does not know at runtime what the type 
+	 * is (because of type erasure with Java generics). It is down to the 
+	 * implementations to check the correct type.</p>
+	 * <p>
+	 * <b>Extension Note:</b>
+	 * This method calls {@code chainMatches()} then calls the decorated matcher's
+	 * {@code matches()} method (if there is a decorated matcher).</p>
+	 */
 	@Override
 	public final boolean matches(Object item)
 	{
 		thisMatches = chainMatches(item);
 		
-		if(decoratedMatcher == null || decoratedMatcher.matches(item))
+		if(!decoratedMatcher.isPresent() || decoratedMatcher.get().matches(item))
 			return thisMatches;
 		else
 			return false;
 	}
 	
+	/**
+	 * Generate a description of why the matcher has not accepted the item. The 
+	 * description will be part of a larger description of why a matching failed,
+	 * so it should be concise. This method assumes that matches(item) is false, 
+	 * but will not check this.
+	 * <p>
+	 * <b>Extension Note:</b>
+	 * This method is called if <i>any</i> of the matchers in the decoration chain
+	 * fails to match. Therefore, when this method is called, it calls the decorated
+	 * matcher's {@code describeMismatch()} then make a call to one of the
+	 * overridden description methods. If {@code chainMatches()} returned 
+	 * {@code true}, then this will call {@code chainDescribeTo()}. Otherwise, it
+	 * calls {@code chainDescribeMismatch()}.</p>
+	 */
 	@Override
 	public final void describeMismatch(Object item, Description mismatchDescription)
 	{
 		//if applicable, we want to get the match/mismatch descriptions of all the
 		// decorated matchers, too
-		if(decoratedMatcher != null)
-		{
-			decoratedMatcher.describeMismatch(item, mismatchDescription);
-			mismatchDescription.appendText("\n             ");
-		}
+		decoratedMatcher.ifPresent(matcher ->
+				{
+					matcher.describeMismatch(item, mismatchDescription);
+					mismatchDescription.appendText("\n             ");
+				});
 		
 		if(thisMatches)
 			chainDescribeTo(mismatchDescription); //explicitly state that this one matched
@@ -136,6 +179,6 @@ public abstract class ChainableMatcher<T> extends BaseMatcher<T>
 	//***************************************************************************
 	// Private fields
 	//***************************************************************************
-	private ChainableTypeSafeMatcher<? super T> decoratedMatcher;
+	private Optional<ChainableTypeSafeMatcher<? super T>> decoratedMatcher;
 	private boolean thisMatches;
 }
