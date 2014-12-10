@@ -5,7 +5,7 @@ import java.util.function.Predicate;
 import org.hamcrest.Matcher;
 import org.hamcrest.MatcherAssert;
 import ezgames.testing.matchers.LambdaMatcher;
-
+//TEST
 /**
  * {@code LambdaAssert} is used to create one-off Matchers using lambdas in the
  * assert statement. You could also create {@code LambdaMatcher}s and use those,
