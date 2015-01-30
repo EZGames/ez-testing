@@ -1,4 +1,4 @@
-package ezgames.testing.mocks;
+package ezgames.testing.mocking;
 
 import static org.junit.Assert.*;
 import static org.hamcrest.core.StringContains.containsString;

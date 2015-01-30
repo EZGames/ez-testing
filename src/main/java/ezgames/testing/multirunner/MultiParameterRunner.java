@@ -6,11 +6,17 @@ import java.util.function.Consumer;
 
 public class MultiParameterRunner<P>
 {
+	//***************************************************************************
+	// Public static factory
+	//***************************************************************************
 	public static <P> MultiParameterRunner<P> run(Consumer<P> testMethod)
 	{
 		return new MultiParameterRunner<>(testMethod);
 	}
 	
+	//***************************************************************************
+	// Public API methods
+	//***************************************************************************
 	public void with(P parameterSet)
 	{
 		testMethod.accept(parameterSet);
@@ -34,6 +40,9 @@ public class MultiParameterRunner<P>
 		}
 	}
 	
+	//***************************************************************************
+	//Private helper
+	//***************************************************************************
 	private Consumer<P> exceptionLogging(Consumer<P> testMethod, Appendable exceptions)
 	{
 		return parameterSet -> {
@@ -56,18 +65,16 @@ public class MultiParameterRunner<P>
 		};
 	}
 	
+	//***************************************************************************
+	// Private constructor
+	//***************************************************************************
 	private MultiParameterRunner(Consumer<P> testMethod)
 	{
 		this.testMethod = testMethod;
 	}
 	
+	//***************************************************************************
+	// Private fields
+	//***************************************************************************
 	private final Consumer<P> testMethod;
-	
-	public static void main(String[] args)
-	{
-		Integer[] nums = {1,2,3,4,5};
-		run(print).with(nums);
-	}
-	
-	public static Consumer<Integer> print = num -> System.out.println(num);
 }
