@@ -22,6 +22,7 @@ public class TestParams<P>
 		testMethod.run(paramSet);
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void testWith(P... paramSets) throws Exception
 	{
 		testMethod.run(paramSets[0]);
