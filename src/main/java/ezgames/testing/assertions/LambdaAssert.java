@@ -21,13 +21,13 @@ import ezgames.testing.matchers.LambdaMatcher;
  */
 public class LambdaAssert
 {
-	public static <T> void assertThat(T actual, String description, Predicate<? super T> matcher)
+	public static <T> void assertThat(T actual, Predicate<? super T> matcher, String description)
 	{
 		Matcher<T> lambdaMatcher = new LambdaMatcher<T>(description, matcher);
 		MatcherAssert.assertThat(actual, lambdaMatcher);
 	}
 	
-	public static <T> void assertThat(T actual, String description, Predicate<? super T> matcher, Function<T, String> mismatchDescription)
+	public static <T> void assertThat(T actual, Predicate<? super T> matcher, String description, Function<T, String> mismatchDescription)
 	{
 		Matcher<T> lambdaMatcher = new LambdaMatcher<>(description, matcher, mismatchDescription);
 		MatcherAssert.assertThat(actual, lambdaMatcher);
