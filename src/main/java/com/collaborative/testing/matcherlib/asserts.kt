@@ -1,6 +1,6 @@
 @file:JvmName("Asserts")
 
-package ezgames.testing.newcrest
+package com.collaborative.testing.matcherlib
 
 fun <T> assertThat(actual: T, matcher: Matcher<T>): Unit
 {
@@ -14,9 +14,9 @@ fun <T> assertThat(actual: T, matcher: Matcher<T>): Unit
 internal fun buildMessage(result: Result): String
 {
     val builder = StringBuilder()
-    builder.append("Expected:\n\t")
+    builder.append("Expected that it:\n\t")
     builder.append(result.expected)
-    builder.append("\nbut:\n\t")
+    builder.append("\nbut it:\n\t")
     builder.append(result.actual)
     return builder.toString()
 }

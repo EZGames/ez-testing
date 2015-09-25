@@ -1,8 +1,9 @@
-package ezgames.testing.newcrest
+package com.collaborative.testing.matcherlib
 
+import org.hamcrest
 import org.hamcrest.StringDescription
 
-class HamcrestAdapter<in T>(private val original: org.hamcrest.Matcher<T>): Matcher<T>
+class HamcrestAdapter<T>(private val original: hamcrest.Matcher<T>): Matcher<T>
 {
     override fun matches(actual: T): Result
     {
