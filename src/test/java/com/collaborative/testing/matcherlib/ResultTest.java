@@ -9,21 +9,21 @@ public class ResultTest
    public static final boolean FAILING = true;
    public static final boolean PASSING = false;
    public static final String EXPECTED = "expected";
-   public static final String ONFAILURE = "onFailure";
-   public static final String OUTEXPECTED = "\texpected";
-   public static final String OUTONFAILURE = "\tonFailure";
+   public static final String ON_FAILURE = "onFailure";
+   public static final String EXPECTED_RESULT = "\texpected";
+   public static final String ON_FAILURE_RESULT = "\tonFailure";
 
    @Test public void failingResultUsesFailureForActual()
    {
-      Result result = new Result(FAILING, EXPECTED, ONFAILURE);
+      Result result = new DefaultResult(FAILING, EXPECTED, ON_FAILURE);
 
-      assertEquals(result.getActual(), OUTONFAILURE);
+      assertEquals(result.getActual(), ON_FAILURE_RESULT);
    }
 
    @Test public void passingResultUsesExpectedForActual()
    {
-      Result result = new Result(PASSING, EXPECTED, ONFAILURE);
+      Result result = new DefaultResult(PASSING, EXPECTED, ON_FAILURE);
 
-      assertEquals(result.getActual(), OUTEXPECTED);
+      assertEquals(result.getActual(), EXPECTED_RESULT);
    }
 }

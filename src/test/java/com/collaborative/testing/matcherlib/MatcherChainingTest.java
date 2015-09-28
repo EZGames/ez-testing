@@ -5,11 +5,11 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 
-import static com.collaborative.testing.matcherlib.MatcherlibPackage.and;
-import static com.collaborative.testing.matcherlib.MatcherlibPackage.chain;
+import static com.collaborative.immatcher.MatcherlibPackage.and;
+import static com.collaborative.immatcher.MatcherlibPackage.chain;
 import static org.junit.Assert.*;
 
-public class MatcherChainerTest
+public class MatcherChainingTest
 {
    @Test public void failsWithFailureLast()
    {
@@ -27,14 +27,14 @@ public class MatcherChainerTest
 
    @Test public void failsWithFailureInMiddle()
    {
-      Result result = chain(chain(MockMatcher.passes(), MockMatcher.fails()), MockMatcher.passes()).matches("");
+      Result result = chain(MockMatcher.passes(), MockMatcher.fails(), MockMatcher.passes()).matches("");
 
       assertTrue(result.getFailed());
    }
 
    @Test public void passesWithAllPassing()
    {
-      Result result = chain(chain(MockMatcher.passes(), MockMatcher.passes()), MockMatcher.passes()).matches("");
+      Result result = chain(MockMatcher.passes(), MockMatcher.passes(), MockMatcher.passes()).matches("");
 
       assertFalse(result.getFailed());
    }
@@ -55,23 +55,23 @@ public class MatcherChainerTest
 
    @Test public void actualMessageOrderFailFailPass()
    {
-      Result result = chain(chain(MockMatcher.fails(), MockMatcher.fails()), MockMatcher.passes()).matches("");
+      Result result = chain(MockMatcher.fails(), MockMatcher.fails(), MockMatcher.passes()).matches("");
 
       assertEquals(result.getActual(), "\tfailed\n\tfailed\n\tpassed");
    }
 
    @Test public void testSuperAndSubTypeMatchers()
    {
-      com.collaborative.testing.matcherlib.Asserts.assertThat(new ArrayList(), and(new TypeMatcher<ArrayList>(), new TypeMatcher<Iterable>()));
-      com.collaborative.testing.matcherlib.Asserts.assertThat(new ArrayList(), and(new TypeMatcher<Iterable>(), new TypeMatcher<ArrayList>()));
-      com.collaborative.testing.matcherlib.Asserts.assertThat(new ArrayList(), chain(new TypeMatcher<ArrayList>(), new TypeMatcher<Iterable>()));
-      com.collaborative.testing.matcherlib.Asserts.assertThat(new ArrayList(), chain(new TypeMatcher<Iterable>(), new TypeMatcher<ArrayList>()));
+      MatcherlibPackage.assertThat(new ArrayList(), and(new TypeMatcher<ArrayList>(), new TypeMatcher<Iterable>()));
+      MatcherlibPackage.assertThat(new ArrayList(), and(new TypeMatcher<Iterable>(), new TypeMatcher<ArrayList>()));
+      MatcherlibPackage.assertThat(new ArrayList(), chain(new TypeMatcher<ArrayList>(), new TypeMatcher<Iterable>(), new TypeMatcher<Iterable>()));
+      MatcherlibPackage.assertThat(new ArrayList(), chain(new TypeMatcher<Iterable>(), new TypeMatcher<ArrayList>(), new TypeMatcher<Iterable>()));
    }
 }
 
 class TypeMatcher<T> implements Matcher<T>
 {
    @NotNull public Result matches(Object actual) {
-      return new Result(false, "", "");
+      return new DefaultResult(false, "", "");
    }
 }

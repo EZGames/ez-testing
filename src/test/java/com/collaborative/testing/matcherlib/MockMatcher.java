@@ -12,7 +12,7 @@ class MockMatcher implements Matcher<String>
 
    @NotNull @Override public Result matches(String actual)
    {
-      return new Result(this.fail, "passed", "failed");
+      return new DefaultResult(this.fail, "passed", "failed");
    }
 
    private final boolean fail;

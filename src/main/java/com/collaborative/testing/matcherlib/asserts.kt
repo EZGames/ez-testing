@@ -1,4 +1,4 @@
-@file:JvmName("Asserts")
+@file:JvmName("Core")
 
 package com.collaborative.testing.matcherlib
 
@@ -11,7 +11,21 @@ fun <T> assertThat(actual: T, matcher: Matcher<T>): Unit
     }
 }
 
-internal fun buildMessage(result: Result): String
+fun <T> assertThat(actual: T, matcher: (in T) -> Result): Unit
+{
+    assertThat(actual, LambdaMatcher(matcher))
+}
+
+fun <T> not(original: Matcher<T>): Matcher<T> = LambdaMatcher { original.matches(it).invert() }
+
+// Hidden [helper] functions and classes
+// TODO Test inversions (with nesting)
+private fun Result.invert(): Result
+{
+    return DefaultResult(!failed, onFailure, expected)
+}
+
+private fun buildMessage(result: Result): String
 {
     val builder = StringBuilder()
     builder.append("Expected that it:\n\t")

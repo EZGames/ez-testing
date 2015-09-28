@@ -27,5 +27,7 @@ public class AssertsTest
          fail("Passing assertion threw an Error");
       }
    }
+
+   //TODO test lambda version?
 }
 

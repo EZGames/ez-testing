@@ -2,14 +2,6 @@
 
 package com.collaborative.testing.matcherlib
 
-internal class MatcherChainer<T>(private val subMatcher: Matcher<T>, private val thisMatcher: Matcher<T>): Matcher<T>
-{
-    override fun matches(actual: T): Result
-    {
-        return subMatcher.matches(actual).chainResult(thisMatcher.matches(actual))
-    }
-}
-
 fun <T> chain(first: Matcher<T>, second: Matcher<T>, vararg matchers: Matcher<in T>): Matcher<T>
 {
     var compound = first.and(second)
@@ -22,12 +14,15 @@ fun <T> chain(first: Matcher<T>, second: Matcher<T>, vararg matchers: Matcher<in
     return compound
 }
 
-fun <T> Matcher<T>.and(next: Matcher<T>) = MatcherChainer<T>(this, next)
+fun <T> Matcher<T>.and(next: Matcher<T>) =
+        LambdaMatcher<T>({ ChainedResult(this.matches(it), next.matches(it)) })
 
-private fun Result.chainResult(after: Result): Result
+// Hidden [helper] functions and classes
+private class ChainedResult(val wrapped: Result, val next: Result): Result
 {
-    val failed = this.failed || after.failed
-    val expected = this.expected + "\n" + after.expected
-    val actual = this.actual + "\n" + after.actual
-    return Result(failed, expected, actual)
+    override val failed: Boolean = wrapped.failed || next.failed
+    override val expected: String = wrapped.expected + "\n" + next.expected
+    override val onFailure: String = wrapped.onFailure + "\n" + next.onFailure
+    override val actual: String
+        get() = wrapped.actual + "\n" + next.actual
 }

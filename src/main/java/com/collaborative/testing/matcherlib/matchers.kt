@@ -8,20 +8,32 @@ interface Matcher<in T>
     {
         fun <T> fromHamcrest(original: hamcrest.Matcher<T>): Matcher<T>
         {
-            return HamcrestAdapter(original)
+            return hamcrest(original)
         }
     }
     fun matches(actual: T):Result
 }
 
-class Result(val failed: Boolean, expected: String, failure: String)
+interface Result
 {
-    val actual: String
+    val failed: Boolean
     val expected: String
+    val onFailure: String
+    val actual: String
+}
+
+class DefaultResult(override val failed: Boolean,
+                    expected: String,
+                    onFailure: String): Result
+{
+    override val actual: String
+    override val expected: String
+    override val onFailure: String
     init
     {
         this.expected = tabIt(expected)
-        this.actual = if(failed) tabIt(failure) else tabIt(expected)
+        this.onFailure = tabIt(onFailure)
+        actual = if(failed) tabIt(onFailure) else tabIt(expected)
     }
 
     private fun tabIt(output: String) =
@@ -30,4 +42,3 @@ class Result(val failed: Boolean, expected: String, failure: String)
         else
             "\t" + output
 }
-
