@@ -10,13 +10,13 @@ internal class MatcherChainer<T>(private val subMatcher: Matcher<T>, private val
     }
 }
 
-fun <T> chain(vararg matchers: Matcher<T>): Matcher<T>
+fun <T> chain(first: Matcher<T>, second: Matcher<T>, vararg matchers: Matcher<in T>): Matcher<T>
 {
-    var compound = matchers.first()
+    var compound = first.and(second)
 
-    for(i in 1..matchers.size())
+    for(matcher in matchers)
     {
-        compound = compound.and(matchers[i])
+        compound = compound.and(matcher)
     }
 
     return compound
