@@ -1,6 +1,6 @@
 @file:JvmName("Chaining")
 
-package com.collaborative.testing.matcherlib
+package ezgames.testing.immatchure
 
 fun <T> chain(first: Matcher<T>, second: Matcher<T>, vararg matchers: Matcher<in T>): Matcher<T>
 {

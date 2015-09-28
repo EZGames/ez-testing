@@ -1,4 +1,4 @@
-package com.collaborative.testing.matcherlib;
+package ezgames.testing.immatchure;
 
 import static org.junit.Assert.*;
 

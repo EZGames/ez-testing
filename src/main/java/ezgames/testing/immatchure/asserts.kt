@@ -1,6 +1,6 @@
 @file:JvmName("Core")
 
-package com.collaborative.testing.matcherlib
+package ezgames.testing.immatchure
 
 fun <T> assertThat(actual: T, matcher: Matcher<T>): Unit
 {

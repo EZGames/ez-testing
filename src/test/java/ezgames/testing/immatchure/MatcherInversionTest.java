@@ -1,4 +1,4 @@
-package com.collaborative.testing.matcherlib;
+package ezgames.testing.immatchure;
 
 public class MatcherInversionTest
 {

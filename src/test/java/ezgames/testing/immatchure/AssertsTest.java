@@ -1,4 +1,4 @@
-package com.collaborative.testing.matcherlib;
+package ezgames.testing.immatchure;
 
 import org.junit.Test;
 
@@ -10,7 +10,7 @@ public class AssertsTest
    {
       try
       {
-         MatcherlibPackage.assertThat("aString", MockMatcher.fails());
+         ImmatchurePackage.assertThat("aString", MockMatcher.fails());
          fail("Failing assertion did not throw an Error");
       }
       catch(AssertionError ex) {}
@@ -20,7 +20,7 @@ public class AssertsTest
    {
       try
       {
-         MatcherlibPackage.assertThat("aString", MockMatcher.passes());
+         ImmatchurePackage.assertThat("aString", MockMatcher.passes());
       }
       catch(AssertionError ex)
       {
