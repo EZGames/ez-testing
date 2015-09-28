@@ -37,7 +37,6 @@ public class ValidatableTest
 		}
 		catch(AssertionError err)
 		{
-			System.out.println(err.getMessage());
 			assertThat(err.getMessage(), containsString(MockValidatable.ERROR_MESSAGE));
 		}
 	}
