@@ -1,8 +1,11 @@
-package ezgames.testing.immatchure;
+package ezgames.testing.immatchure.mocks;
 
+import ezgames.testing.immatchure.DefaultResult;
+import ezgames.testing.immatchure.Matcher;
+import ezgames.testing.immatchure.Result;
 import org.jetbrains.annotations.NotNull;
 
-class MockMatcher implements Matcher<String>
+public class MockMatcher implements Matcher<String>
 {
    // static factories
    public static MockMatcher passes() { return new MockMatcher(false); }

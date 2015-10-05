@@ -1,5 +1,6 @@
 package ezgames.testing.immatchure;
 
+import static ezgames.testing.immatchure.mocks.MockMatcher.*;
 import org.junit.Test;
 
 import static org.junit.Assert.fail;
@@ -10,7 +11,7 @@ public class AssertsTest
    {
       try
       {
-         ImmatchurePackage.assertThat("aString", MockMatcher.fails());
+         ImmatchurePackage.assertThat("aString", fails());
          fail("Failing assertion did not throw an Error");
       }
       catch(AssertionError ex) {}
@@ -20,7 +21,7 @@ public class AssertsTest
    {
       try
       {
-         ImmatchurePackage.assertThat("aString", MockMatcher.passes());
+         ImmatchurePackage.assertThat("aString", passes());
       }
       catch(AssertionError ex)
       {
